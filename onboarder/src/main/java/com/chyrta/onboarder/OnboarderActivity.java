@@ -24,21 +24,20 @@ import java.util.List;
 public abstract class OnboarderActivity extends AppCompatActivity implements View.OnClickListener, ViewPager.OnPageChangeListener
 {
 
-	private Integer[]            colors;
-	private CircleIndicatorView  circleIndicatorView;
-	private ViewPager            vpOnboarderPager;
-	private OnboarderAdapter     onboarderAdapter;
-	private ImageButton          ibNext;
+	private Integer[]            m_colors;
+	private CircleIndicatorView  m_circleIndicatorView;
+	private ViewPager            m_vwpgrOnboarder;
+	private OnboarderAdapter     m_onboarderAdapter;
+	private ImageButton          m_imgbtnNext;
 	private ImageButton          m_imgbtnPrevious;
-	private Button               btnSkip;
-	private Button               btnFinish;
-	private ConstraintLayout     buttonsLayout;
-	private FloatingActionButton fab;
-	private View                 divider;
-	private ArgbEvaluator        evaluator;
-
-	private boolean shouldDarkenButtonsLayout     = false;
-	private boolean shouldUseFloatingActionButton = false;
+	private Button               m_btnSkip;
+	private Button               m_btnFinish;
+	private ConstraintLayout     m_conlytButtons;
+	private FloatingActionButton m_fab;
+	private View                 m_vwDivider;
+	private ArgbEvaluator        m_evaluator;
+	private boolean m_darkenButtonLayout      = false;
+	private boolean m_useFloatingActionButton = false;
 
 
 	@Override
@@ -46,120 +45,80 @@ public abstract class OnboarderActivity extends AppCompatActivity implements Vie
 		super.onCreate(savedInstanceState);
 
 		setContentView(R.layout.activity_onboarder);
+
 		setStatusBackgroundColor();
 		hideActionBar();
 
-		circleIndicatorView = (CircleIndicatorView) findViewById(R.id.circle_indicator_view);
-		ibNext = (ImageButton) findViewById(R.id.ib_next);
-		m_imgbtnPrevious = (ImageButton) findViewById(R.id.imgbtn_previous);
-		btnSkip = (Button) findViewById(R.id.btn_skip);
-		btnFinish = (Button) findViewById(R.id.btn_finish);
-		buttonsLayout = (ConstraintLayout) findViewById(R.id.buttons_layout);
-		fab = (FloatingActionButton) findViewById(R.id.fab);
-		divider = findViewById(R.id.divider);
-		vpOnboarderPager = (ViewPager) findViewById(R.id.vp_onboarder_pager);
-		vpOnboarderPager.addOnPageChangeListener(this);
+		findViews();
 
-		ibNext.setOnClickListener(this);
-		m_imgbtnPrevious.setOnClickListener(this);
-		btnSkip.setOnClickListener(this);
-		btnFinish.setOnClickListener(this);
-		fab.setOnClickListener(this);
-		evaluator = new ArgbEvaluator();
+		setupViews();
 	}
 
 
 	public void setOnboardPagesReady(List<OnboarderPage> pages) {
-		onboarderAdapter = new OnboarderAdapter(pages, getSupportFragmentManager());
-		vpOnboarderPager.setAdapter(onboarderAdapter);
-		colors = ColorsArrayBuilder.getPageBackgroundColors(this, pages);
-		circleIndicatorView.setPageIndicators(pages.size());
+		m_onboarderAdapter = new OnboarderAdapter(pages, getSupportFragmentManager());
+		m_vwpgrOnboarder.setAdapter(m_onboarderAdapter);
+		m_colors = ColorsArrayBuilder.getPageBackgroundColors(this, pages);
+		m_circleIndicatorView.setPageIndicators(pages.size());
 	}
 
 
 	public void setInactiveIndicatorColor(int color) {
-		circleIndicatorView.setInactiveIndicatorColor(color);
+		m_circleIndicatorView.setInactiveIndicatorColor(color);
 	}
 
 
 	public void setActiveIndicatorColor(int color) {
-		circleIndicatorView.setActiveIndicatorColor(color);
+		m_circleIndicatorView.setActiveIndicatorColor(color);
 	}
 
 
-	public void shouldDarkenButtonsLayout(boolean shouldDarkenButtonsLayout_) {
-		shouldDarkenButtonsLayout = shouldDarkenButtonsLayout_;
+	public void darkenButtonLayout(boolean darkenButtonLayout) {
+		m_darkenButtonLayout = darkenButtonLayout;
 	}
 
 
 	public void setDividerColor(@ColorInt int color) {
-		if (!shouldDarkenButtonsLayout) {
-			divider.setBackgroundColor(color);
+		if (!m_darkenButtonLayout) {
+			m_vwDivider.setBackgroundColor(color);
 		}
 	}
 
 
 	public void setDividerHeight(int heightInDp) {
-		if (!shouldDarkenButtonsLayout) {
-			divider.getLayoutParams().height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, heightInDp, getResources().getDisplayMetrics());
+		if (!m_darkenButtonLayout) {
+			m_vwDivider.getLayoutParams().height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, heightInDp, getResources().getDisplayMetrics());
 		}
 	}
 
 
 	public void setDividerVisibility(int dividerVisibility) {
-		divider.setVisibility(dividerVisibility);
+		m_vwDivider.setVisibility(dividerVisibility);
 	}
 
 
 	public void setSkipButtonTitle(CharSequence title) {
-		btnSkip.setText(title);
-	}
-
-
-	public void setSkipButtonHidden() {
-		btnSkip.setVisibility(View.INVISIBLE);
+		m_btnSkip.setText(title);
 	}
 
 
 	public void setSkipButtonTitle(@StringRes int titleResId) {
-		btnSkip.setText(titleResId);
+		m_btnSkip.setText(titleResId);
+	}
+
+
+	public void setSkipButtonHidden() {
+		m_btnSkip.setVisibility(View.INVISIBLE);
 	}
 
 
 	public void setFinishButtonTitle(CharSequence title) {
-		btnFinish.setText(title);
+		m_btnFinish.setText(title);
 	}
 
 
 	public void setFinishButtonTitle(@StringRes int titleResId) {
-		btnFinish.setText(titleResId);
-	}
-
-
-	public void shouldUseFloatingActionButton(boolean shouldUseFloatingActionButton_) {
-
-		shouldUseFloatingActionButton = shouldUseFloatingActionButton_;
-
-		if (shouldUseFloatingActionButton) {
-			fab.setVisibility(View.VISIBLE);
-			setDividerVisibility(View.INVISIBLE);
-			shouldDarkenButtonsLayout(false);
-			btnFinish.setVisibility(View.INVISIBLE);
-			btnSkip.setVisibility(View.INVISIBLE);
-			ibNext.setVisibility(View.INVISIBLE);
-			ibNext.setFocusable(false);
-			m_imgbtnPrevious.setVisibility(View.INVISIBLE);
-			m_imgbtnPrevious.setFocusable(false);
-			buttonsLayout.getLayoutParams().height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 96, getResources().getDisplayMetrics());
-		}
-	}
-
-
-	private int darkenColor(@ColorInt int color) {
-		float[] hsv = new float[3];
-		Color.colorToHSV(color, hsv);
-		hsv[2] *= 0.9f;
-		return Color.HSVToColor(hsv);
+		m_btnFinish.setText(titleResId);
 	}
 
 
@@ -171,16 +130,36 @@ public abstract class OnboarderActivity extends AppCompatActivity implements Vie
 	}
 
 
+	public void useFloatingActionButton() {
+		m_useFloatingActionButton = true;
+
+		// show the FAB
+		m_fab.setVisibility(View.VISIBLE);
+
+		setDividerVisibility(View.INVISIBLE);
+		darkenButtonLayout(false);
+
+		m_btnFinish.setVisibility(View.INVISIBLE);
+		m_btnSkip.setVisibility(View.INVISIBLE);
+		m_imgbtnNext.setVisibility(View.INVISIBLE);
+		m_imgbtnNext.setFocusable(false);
+		m_imgbtnPrevious.setVisibility(View.INVISIBLE);
+		m_imgbtnPrevious.setFocusable(false);
+
+		m_conlytButtons.getLayoutParams().height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 96, getResources().getDisplayMetrics());
+	}
+
+
 	@Override
 	public void onClick(View v) {
 		final int i = v.getId();
-		final boolean isInLastPage = vpOnboarderPager.getCurrentItem() == onboarderAdapter.getCount() - 1;
+		final boolean isInLastPage = m_vwpgrOnboarder.getCurrentItem() == m_onboarderAdapter.getCount() - 1;
 
 		if (i == R.id.ib_next || i == R.id.fab && !isInLastPage) {
-			vpOnboarderPager.setCurrentItem(vpOnboarderPager.getCurrentItem() + 1);
+			m_vwpgrOnboarder.setCurrentItem(m_vwpgrOnboarder.getCurrentItem() + 1);
 		}
 		else if (i == R.id.imgbtn_previous) {
-			vpOnboarderPager.setCurrentItem(vpOnboarderPager.getCurrentItem() - 1);
+			m_vwpgrOnboarder.setCurrentItem(m_vwpgrOnboarder.getCurrentItem() - 1);
 		}
 		else if (i == R.id.btn_skip) {
 			onSkipButtonPressed();
@@ -193,40 +172,42 @@ public abstract class OnboarderActivity extends AppCompatActivity implements Vie
 
 	@Override
 	public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-		if (position < (onboarderAdapter.getCount() - 1) && position < (colors.length - 1)) {
-			vpOnboarderPager.setBackgroundColor((Integer) evaluator.evaluate(positionOffset, colors[position], colors[position + 1]));
-			if (shouldDarkenButtonsLayout) {
-				buttonsLayout.setBackgroundColor(darkenColor((Integer) evaluator.evaluate(positionOffset, colors[position], colors[position + 1])));
-				divider.setVisibility(View.INVISIBLE);
-			}
+		int backgroundColor;
+
+		if (position < (m_onboarderAdapter.getCount() - 1) && position < (m_colors.length - 1)) {
+			backgroundColor =(Integer) m_evaluator.evaluate(positionOffset, m_colors[position], m_colors[position + 1]) ;
 		}
 		else {
-			vpOnboarderPager.setBackgroundColor(colors[colors.length - 1]);
-			if (shouldDarkenButtonsLayout) {
-				buttonsLayout.setBackgroundColor(darkenColor(colors[colors.length - 1]));
-				divider.setVisibility(View.INVISIBLE);
-			}
+			backgroundColor = m_colors[m_colors.length - 1];
+		}
+
+		m_vwpgrOnboarder.setBackgroundColor(backgroundColor);
+
+		if (m_darkenButtonLayout) {
+			m_conlytButtons.setBackgroundColor(darkenColor(backgroundColor));
+			m_vwDivider.setVisibility(View.INVISIBLE);
 		}
 	}
 
 
 	@Override
 	public void onPageSelected(int position) {
-		final int lastPagePosition = onboarderAdapter.getCount() - 1;
-		circleIndicatorView.setCurrentPage(position);
+		final int lastPagePosition = m_onboarderAdapter.getCount() - 1;
+
+		m_circleIndicatorView.setCurrentPage(position);
 
 		// Grey out the previous button when on the first page
-		m_imgbtnPrevious.setColorFilter(position == 0 && !shouldUseFloatingActionButton ? Color.GRAY : Color.WHITE);
+		m_imgbtnPrevious.setColorFilter(position == 0 && !m_useFloatingActionButton ? Color.GRAY : Color.WHITE);
 
 		// Hide the next button and the skip button when on the last page (otherwise : show)
-		ibNext.setVisibility(position == lastPagePosition && !shouldUseFloatingActionButton ? View.INVISIBLE : View.VISIBLE);
-		btnSkip.setVisibility(position == lastPagePosition && !shouldUseFloatingActionButton ? View.INVISIBLE : View.VISIBLE);
+		m_imgbtnNext.setVisibility(position == lastPagePosition && !m_useFloatingActionButton ? View.INVISIBLE : View.VISIBLE);
+		m_btnSkip.setVisibility(position == lastPagePosition && !m_useFloatingActionButton ? View.INVISIBLE : View.VISIBLE);
 
 		// Show the Finish button when on the last page.  (otherwise : hide)
-		btnFinish.setVisibility(position == lastPagePosition && !shouldUseFloatingActionButton ? View.VISIBLE : View.INVISIBLE);
+		m_btnFinish.setVisibility(position == lastPagePosition && !m_useFloatingActionButton ? View.VISIBLE : View.INVISIBLE);
 
-		if (shouldUseFloatingActionButton) {
-			fab.setImageResource(position == lastPagePosition ? R.drawable.ic_done_white_24dp : R.drawable.ic_arrow_forward_white_24dp);
+		if (m_useFloatingActionButton) {
+			m_fab.setImageResource(position == lastPagePosition ? R.drawable.ic_done_white_24dp : R.drawable.ic_arrow_forward_white_24dp);
 		}
 	}
 
@@ -236,17 +217,49 @@ public abstract class OnboarderActivity extends AppCompatActivity implements Vie
 	}
 
 
+	protected void onSkipButtonPressed() {
+		m_vwpgrOnboarder.setCurrentItem(m_onboarderAdapter.getCount());
+	}
+
+
+	abstract protected void onFinishButtonPressed();
+
+
+	private void findViews() {
+		m_circleIndicatorView = (CircleIndicatorView) findViewById(R.id.circle_indicator_view);
+		m_imgbtnNext = (ImageButton) findViewById(R.id.ib_next);
+		m_imgbtnPrevious = (ImageButton) findViewById(R.id.imgbtn_previous);
+		m_btnSkip = (Button) findViewById(R.id.btn_skip);
+		m_btnFinish = (Button) findViewById(R.id.btn_finish);
+		m_conlytButtons = (ConstraintLayout) findViewById(R.id.buttons_layout);
+		m_fab = (FloatingActionButton) findViewById(R.id.fab);
+		m_vwDivider = findViewById(R.id.divider);
+		m_vwpgrOnboarder = (ViewPager) findViewById(R.id.vp_onboarder_pager);
+	}
+
+
+	private void setupViews() {
+		m_vwpgrOnboarder.addOnPageChangeListener(this);
+		m_imgbtnNext.setOnClickListener(this);
+		m_imgbtnPrevious.setOnClickListener(this);
+		m_btnSkip.setOnClickListener(this);
+		m_btnFinish.setOnClickListener(this);
+		m_fab.setOnClickListener(this);
+		m_evaluator = new ArgbEvaluator();
+	}
+
+
+	private int darkenColor(@ColorInt int color) {
+		float[] hsv = new float[3];
+		Color.colorToHSV(color, hsv);
+		hsv[2] *= 0.9f;
+		return Color.HSVToColor(hsv);
+	}
+
+
 	private void hideActionBar() {
 		if (getSupportActionBar() != null) {
 			getSupportActionBar().hide();
 		}
 	}
-
-
-	protected void onSkipButtonPressed() {
-		vpOnboarderPager.setCurrentItem(onboarderAdapter.getCount());
-	}
-
-
-	abstract public void onFinishButtonPressed();
 }
