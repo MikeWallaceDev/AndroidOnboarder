@@ -55,7 +55,7 @@ public abstract class OnboarderActivity extends AppCompatActivity implements Vie
 	}
 
 
-	public void setOnboardPagesReady(List<OnboarderPage> pages) {
+	public void setOnboardPagesReady(final List<OnboarderPage> pages) {
 		m_onboarderAdapter = new OnboarderAdapter(pages, getSupportFragmentManager());
 		m_vwpgrOnboarder.setAdapter(m_onboarderAdapter);
 		m_colors = ColorsArrayBuilder.getPageBackgroundColors(this, pages);
@@ -107,7 +107,7 @@ public abstract class OnboarderActivity extends AppCompatActivity implements Vie
 	}
 
 
-	public void setSkipButtonHidden() {
+	public void hideSkipButton() {
 		m_btnSkip.setVisibility(View.INVISIBLE);
 	}
 
