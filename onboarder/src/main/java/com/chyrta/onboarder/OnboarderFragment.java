@@ -85,9 +85,9 @@ public class OnboarderFragment extends Fragment
 		onboarderImageResId = bundle.getInt(ONBOARDER_PAGE_IMAGE_RES_ID, 0);
 
 		onboarderView = inflater.inflate(R.layout.fragment_onboarder, container, false);
-		ivOnboarderImage = (ImageView) onboarderView.findViewById(R.id.iv_onboarder_image);
-		tvOnboarderTitle = (TextView) onboarderView.findViewById(R.id.tv_onboarder_title);
-		tvOnboarderDescription = (TextView) onboarderView.findViewById(R.id.tv_onboarder_description);
+		ivOnboarderImage = (ImageView) onboarderView.findViewById(R.id.imgvw_image);
+		tvOnboarderTitle = (TextView) onboarderView.findViewById(R.id.txtvw_title);
+		tvOnboarderDescription = (TextView) onboarderView.findViewById(R.id.txtvw_description);
 
 		if (onboarderTitle != null) {
 			tvOnboarderTitle.setText(onboarderTitle);
@@ -138,7 +138,7 @@ public class OnboarderFragment extends Fragment
 			@Override
 			public void run() {
 				if (tvOnboarderDescription.getLineCount() > 1) {
-					tvOnboarderDescription.setGravity(Gravity.START);
+					tvOnboarderDescription.setGravity(Gravity.START|Gravity.CENTER);
 				}
 				else {
 					tvOnboarderDescription.setGravity(Gravity.CENTER);
